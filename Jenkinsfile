@@ -77,15 +77,23 @@ pipeline {
             }
         }
         
-/*         stage('OWASP Dependency Check') {
+        stage('OWASP Dependency Check') {
             steps {
-                dir('server') { 
+                dir('auth') { 
+                   dependencyCheck additionalArguments: '--scan ./   ', odcInstallation: 'DP'
+                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
+                }
+                dir('UI') { 
+                   dependencyCheck additionalArguments: '--scan ./   ', odcInstallation: 'DP'
+                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
+                }
+                dir('weather') { 
                    dependencyCheck additionalArguments: '--scan ./   ', odcInstallation: 'DP'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
             }
         }
-*/        
+        
         stage('Docker Build & Push') {
             steps {
                    script {
