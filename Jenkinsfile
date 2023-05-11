@@ -105,12 +105,12 @@ pipeline {
                             }
                             dir('UI') {
                                 sh "docker build -t weatherapp-ui ."
-                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                                sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
                                 sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
                             }
                             dir('weather') {
                                 sh "docker build -t weatherapp-weather ."
-                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                                sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
                                 sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
                             }
                         }
