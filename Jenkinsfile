@@ -43,7 +43,7 @@ pipeline {
                     sh "npm run test"
                 }
                 dir('server') {
-                    sh "npm run test"
+                    sh "npm run test" 
                 }
             }
         }
