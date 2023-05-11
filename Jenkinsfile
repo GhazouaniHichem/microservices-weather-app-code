@@ -22,11 +22,11 @@ pipeline {
 
         stage('Git Checkout ') {
             steps {
-                git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/MERN-app-CI-CD-pipeline.git'
+                git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/microservices-weather-app-code.git'
             }
         }
         
-        stage('Code Build') {
+/*        stage('Code Build') {
             steps {
                 dir('client') {
                     sh "npm install"
@@ -36,7 +36,7 @@ pipeline {
                 }
             }
         }
-        
+*/        
 /*         stage('Run Test Cases') {
             steps {
                 dir('client') {
@@ -50,7 +50,7 @@ pipeline {
 */        
         stage('Sonarqube Analysis') {
             steps {
-                dir('client') {
+                dir('UI') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=NodeJS-App \
                         -Dsonar.sources=. \
@@ -58,12 +58,20 @@ pipeline {
                         -Dsonar.projectKey=NodeJS-App '''
                     }
                 }
-                dir('server') {
+                dir('auth') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=NodeJS-App \
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth \
                         -Dsonar.sources=. \
-                        -Dsonar.css.node=. \
-                        -Dsonar.projectKey=NodeJS-App '''
+                        -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
+                        -Dsonar.projectKey=auth '''
+                    }
+                }
+                dir('weather') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather \
+                        -Dsonar.sources=. \
+                        -Dsonar.language=py \
+                        -Dsonar.projectKey=weather '''
                     }
                 }
             }
@@ -82,15 +90,20 @@ pipeline {
             steps {
                    script {
                        withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
-                            dir('client') {
-                                sh "docker build -t movies-mern-app-frontend ."
-                                sh "docker tag webapp ghazouanihm/movies-mern-app-frontend:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/movies-mern-app-frontend:${BUILD_NUMBER}"
+                            dir('auth') {
+                                sh "docker build -t weatherapp-auth ."
+                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
                             }
-                            dir('server') {
-                                sh "docker build -t movies-mern-app-backend ."
-                                sh "docker tag webapp ghazouanihm/movies-mern-app-backend:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/movies-mern-app-backend:${BUILD_NUMBER}"
+                            dir('UI') {
+                                sh "docker build -t weatherapp-ui ."
+                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                            }
+                            dir('weather') {
+                                sh "docker build -t weatherapp-weather ."
+                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
                             }
                         }
                    } 
@@ -99,8 +112,9 @@ pipeline {
         
         stage('Docker Image scan') {
             steps {
-                    sh "trivy image ghazouanihm/movies-mern-app-frontend:${BUILD_NUMBER}"
-                    sh "trivy image ghazouanihm/movies-mern-app-backend:${BUILD_NUMBER}"
+                    sh "trivy image ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
+                    sh "trivy image ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                    sh "trivy image ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
             }
         }
 
@@ -109,7 +123,7 @@ pipeline {
                 IMAGE_TAG = "${BUILD_NUMBER}"
             }
             steps {
-                build job: 'mern-gitops-pipeline', parameters: [
+                build job: 'weather-app-gitops-pipeline', parameters: [
                 string(name: 'IMAGE_TAG', value: "${env.IMAGE_TAG}")
                 ]
             }
