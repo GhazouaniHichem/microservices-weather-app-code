@@ -126,6 +126,16 @@ pipeline {
             }
         }
 
+        stage('Apply argocd appliction file') {
+            steps {
+                script {
+                    withKubeConfig([credentialsId: 'kubernetes-config']) {
+                        sh 'kubectl apply -f gitops/weather-app-argocd-application.yaml'
+                    }
+                }
+            }
+        }
+
         stage('Trigger gitops pipeline') {
             environment {
                 IMAGE_TAG = "${BUILD_NUMBER}"
