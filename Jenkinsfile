@@ -126,8 +126,7 @@ pipeline {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
-                        //sh 'kubectl apply -f gitops/weather-app-argocd-application.yaml'
-                        kubernetesDeploy(configs: "gitops/weather-app-argocd-application.yaml")
+                        sh 'kubectl apply -f gitops/weather-app-argocd-application.yaml'
                     }
                 }
             }
