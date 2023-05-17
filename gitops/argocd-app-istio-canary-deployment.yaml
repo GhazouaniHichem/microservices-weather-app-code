@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: weather-app-istio-canary-deployment-application
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/GhazouaniHichem/microservices-weather-app-gitops.git
+    targetRevision: main
+    path: ./kubernetes/istio-deployment/
+  destination: 
+    server: https://kubernetes.default.svc
+    namespace: weather-app
+
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true
