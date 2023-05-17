@@ -128,7 +128,7 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
                         sh 'kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.17/samples/addons/prometheus.yaml'
                         sh 'kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.17/samples/addons/kiali.yaml'
-                        sh 'kubectl apply -f gitops/weather-app-argocd-application.yaml'
+                        sh 'kubectl apply -f gitops'
                     }
                 }
             }
