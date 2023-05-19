@@ -1,8 +1,8 @@
-const express = require('express')
-const app = express()
-const port = 3000
-const path = require('path')
-const axios = require('axios')
+const express = require('express');
+const app = express();
+const port = 3000;
+const path = require('path');
+const axios = require('axios');
 const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
 
