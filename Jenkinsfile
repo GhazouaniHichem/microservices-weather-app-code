@@ -51,7 +51,6 @@ pipeline {
 
             steps {
                 dir('UI') {
-                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner \
                             -Dsonar.projectName=UI-NodeJS-App \
@@ -62,10 +61,8 @@ pipeline {
                         timeout(time: 1, unit: 'HOURS') {
                             waitForQualityGate abortPipeline: true
                         }
-                    }
                 }
                 dir('auth') {
-                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
                             -Dsonar.sources=. \
@@ -77,10 +74,8 @@ pipeline {
                         timeout(time: 1, unit: 'HOURS') {
                             waitForQualityGate abortPipeline: true
                         }
-                    }
                 }
                 dir('weather') {
-                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
                             -Dsonar.sources=. \
@@ -90,7 +85,6 @@ pipeline {
                         timeout(time: 1, unit: 'HOURS') {
                             waitForQualityGate abortPipeline: true
                         }
-                    }
                 }
             }
         }
