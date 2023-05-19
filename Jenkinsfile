@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'node'
+    }
+    
     stages {
          stage('Cleanup Workspace'){
             steps {
@@ -48,7 +52,8 @@ pipeline {
             steps {
                 dir('UI') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=UI-NodeJS-App \
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=UI-NodeJS-App \
                         -Dsonar.sources=. \
                         -Dsonar.css.node=. \
                         -Dsonar.projectKey=UI-NodeJS-App '''
