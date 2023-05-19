@@ -56,7 +56,8 @@ pipeline {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner \
                             -Dsonar.projectName=UI-NodeJS-App \
                             -Dsonar.sources=. \
-                            -Dsonar.css.node=. \
+                            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
                             -Dsonar.projectKey=UI-NodeJS-App '''
                         }
 //                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
