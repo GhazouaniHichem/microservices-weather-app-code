@@ -60,7 +60,6 @@ pipeline {
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
                         -Dsonar.inclusions=**/.*go \
-                        -Dsonar.language=go \
                         -Dsonar.projectKey=auth-Golang-App '''
                     }
                 }
