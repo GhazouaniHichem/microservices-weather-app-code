@@ -4,7 +4,7 @@ pipeline {
     tools {
         nodejs 'node'
     }
-    
+
     stages {
          stage('Cleanup Workspace'){
             steps {
@@ -76,6 +76,14 @@ pipeline {
                         -Dsonar.language=py \
                         -Dsonar.projectKey=weather-Python-App '''
                     }
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
                 }
             }
         }
