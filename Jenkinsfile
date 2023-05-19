@@ -1,10 +1,5 @@
 pipeline {
     agent any
-    
-    
-    environment{
-        SCANNER_HOME= tool 'sonar-scanner'
-    }
 
     stages {
          stage('Cleanup Workspace'){
@@ -45,29 +40,36 @@ pipeline {
         }
 */        
         stage('Sonarqube Analysis') {
+
+            environment{
+                SCANNER_HOME= tool 'sonar-scanner'
+            }
+
             steps {
                 dir('UI') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=NodeJS-App \
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=UI-NodeJS-App \
                         -Dsonar.sources=. \
                         -Dsonar.css.node=. \
-                        -Dsonar.projectKey=NodeJS-App '''
+                        -Dsonar.projectKey=UI-NodeJS-App '''
                     }
                 }
                 dir('auth') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth \
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
-                        -Dsonar.projectKey=auth '''
+                        -Dsonar.inclusions=**/.*go \
+                        -Dsonar.language=go \
+                        -Dsonar.projectKey=auth-Golang-App '''
                     }
                 }
                 dir('weather') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather \
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
                         -Dsonar.sources=. \
                         -Dsonar.language=py \
-                        -Dsonar.projectKey=weather '''
+                        -Dsonar.projectKey=weather-Python-App '''
                     }
                 }
             }
