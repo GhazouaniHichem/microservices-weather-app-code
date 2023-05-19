@@ -58,11 +58,9 @@ pipeline {
                             -Dsonar.css.node=. \
                             -Dsonar.projectKey=UI-NodeJS-App '''
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
+                        if ("${json.projectStatus.status}" == "ERROR") {
+                            currentBuild.result = 'FAILURE'
+                            error('Pipeline aborted due to quality gate failure.')
                         }
                 }
                 dir('auth') {
@@ -74,11 +72,9 @@ pipeline {
                             -Dsonar.language=go \
                             -Dsonar.projectKey=auth-Golang-App '''
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
+                        if ("${json.projectStatus.status}" == "ERROR") {
+                            currentBuild.result = 'FAILURE'
+                            error('Pipeline aborted due to quality gate failure.')
                         }
                 }
                 dir('weather') {
@@ -88,11 +84,9 @@ pipeline {
                             -Dsonar.language=py \
                             -Dsonar.projectKey=weather-Python-App '''
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
+                        if ("${json.projectStatus.status}" == "ERROR") {
+                            currentBuild.result = 'FAILURE'
+                            error('Pipeline aborted due to quality gate failure.')
                         }
 
                 }
