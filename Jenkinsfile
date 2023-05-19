@@ -48,43 +48,71 @@ pipeline {
             environment{
                 SCANNER_HOME= tool 'sonar-scanner'
             }
+            stages {
+                stage('SonarQUbe Analysis for UI-NodeJS App') {
+                    steps {
+                        dir('UI') {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                                    -Dsonar.projectName=UI-NodeJS-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.css.node=. \
+                                    -Dsonar.projectKey=UI-NodeJS-App '''
+                                }
+                        }
+                    }
+                }
+                stage ('Quality Gate for UI-NodeJS App') {
+                    timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                        def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                        if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
 
-            steps {
-                dir('UI') {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                            -Dsonar.projectName=UI-NodeJS-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.css.node=. \
-                            -Dsonar.projectKey=UI-NodeJS-App '''
+                stage('SonarQUbe Analysis for auth-Go App') {
+                    steps {
+                        dir('UI') {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
+                                    -Dsonar.inclusions=**/*.go \
+                                    -Dsonar.language=go \
+                                    -Dsonar.projectKey=auth-Golang-App '''
+                                }
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
-                        }
+                    }
                 }
-                dir('auth') {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
-                            -Dsonar.inclusions=**/*.go \
-                            -Dsonar.language=go \
-                            -Dsonar.projectKey=auth-Golang-App '''
+                stage ('Quality Gate for auth-Go App') {
+                    timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                        def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                        if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
-                        }
+                    }
                 }
-                dir('weather') {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.language=py \
-                            -Dsonar.projectKey=weather-Python-App '''
+                
+                stage('SonarQUbe Analysis for weather-Python App') {
+                    steps {
+                        dir('UI') {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.language=py \
+                                    -Dsonar.projectKey=weather-Python-App '''
+                                }
                         }
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
+                    }
+                }
+                stage ('Quality Gate for weather-Python App') {
+                    timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                        def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                        if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
+                    }
                 }
             }
         }
