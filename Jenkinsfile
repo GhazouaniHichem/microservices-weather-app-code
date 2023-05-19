@@ -51,6 +51,7 @@ pipeline {
 
             steps {
                 dir('UI') {
+                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner \
                             -Dsonar.projectName=UI-NodeJS-App \
@@ -62,8 +63,10 @@ pipeline {
                             currentBuild.result = 'FAILURE'
                             error('Pipeline aborted due to quality gate failure.')
                         }
+                    }
                 }
                 dir('auth') {
+                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
                             -Dsonar.sources=. \
@@ -76,8 +79,10 @@ pipeline {
                             currentBuild.result = 'FAILURE'
                             error('Pipeline aborted due to quality gate failure.')
                         }
+                    }
                 }
                 dir('weather') {
+                    steps {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
                             -Dsonar.sources=. \
@@ -88,7 +93,7 @@ pipeline {
                             currentBuild.result = 'FAILURE'
                             error('Pipeline aborted due to quality gate failure.')
                         }
-
+                    }
                 }
             }
         }
