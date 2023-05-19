@@ -59,7 +59,8 @@ pipeline {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
-                        -Dsonar.inclusions=**/.*go \
+                        -Dsonar.inclusions=**/*.go \
+                        -Dsonar.language=go \
                         -Dsonar.projectKey=auth-Golang-App '''
                     }
                 }
