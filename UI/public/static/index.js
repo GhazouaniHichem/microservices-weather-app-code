@@ -3,7 +3,7 @@ $(document).ready(() => {
         getWeather($('#city').val())
     })
     $('#city').keypress(function (event) {
-        var keycode = (event.keyCode ? event.keyCode : event.which);
+        let keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             getWeather($('#city').val())
         }
@@ -14,7 +14,7 @@ $(document).ready(() => {
             type: 'get',
             url: '/weather/' + city,
             success: function (res){
-                result = JSON.parse(res)
+                let result = JSON.parse(res)
                 $('#result').show()
                 $('#weather_icon').attr("src","https://" + result.current.condition.icon)
                 $('#weather_text').html(result.current.condition.text)
