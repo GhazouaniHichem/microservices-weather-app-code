@@ -141,8 +141,27 @@ pipeline {
                 string(name: 'IMAGE_TAG', value: "${env.IMAGE_TAG}")
                 ]
             }
-        }
+        }   
+    }
 
-        
+    post {
+        always {
+            script {
+                def status = currentBuild.result ?: 'UNKOWN'
+                def color
+                switch(status) {
+                    case 'SUCCESS':
+                        color = 'good'
+                        break
+                    case 'Failure':
+                        color = 'danger'
+                        break
+                    default:
+                        color = 'warning'
+                    
+                }
+                slackSend(channel: '#devops', message: "Update Deployment ${status.toLowerCase()} for ${env.JOB_NAME} (${env.BUILD_NUMBER}) - ${env.BUILD_URL}", iconEmoji: ':jenkins:', color: color)
+            }
+        }
     }
 }
