@@ -51,7 +51,7 @@ pipeline {
 
             steps {
                 dir('UI') {
-                    steps {
+                    script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner \
                             -Dsonar.projectName=UI-NodeJS-App \
@@ -66,7 +66,7 @@ pipeline {
                     }
                 }
                 dir('auth') {
-                    steps {
+                    script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
                             -Dsonar.sources=. \
@@ -82,7 +82,7 @@ pipeline {
                     }
                 }
                 dir('weather') {
-                    steps {
+                    script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
                             -Dsonar.sources=. \
