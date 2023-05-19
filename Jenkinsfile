@@ -48,8 +48,8 @@ pipeline {
             environment{
                 SCANNER_HOME= tool 'sonar-scanner'
             }
-            stages {
-                stage('SonarQUbe Analysis for UI-NodeJS App') {
+//            stages {
+//                stage('SonarQUbe Analysis for UI-NodeJS App') {
                     steps {
                         dir('UI') {
                                 withSonarQubeEnv('sonar-server') {
@@ -61,7 +61,7 @@ pipeline {
                                 }
                         }
                     }
-                }
+                //}
                 stage ('Quality Gate for UI-NodeJS App') {
                     steps {
                         timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
@@ -73,7 +73,7 @@ pipeline {
                     }
                 }
 
-            }
+//            }
         }
         
         stage('OWASP Dependency Check') {
