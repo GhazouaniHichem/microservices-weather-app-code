@@ -59,7 +59,10 @@ pipeline {
                             -Dsonar.projectKey=UI-NodeJS-App '''
                         }
                         timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
+                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                            if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
                         }
                 }
                 dir('auth') {
@@ -72,7 +75,10 @@ pipeline {
                             -Dsonar.projectKey=auth-Golang-App '''
                         }
                         timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
+                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                            if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
                         }
                 }
                 dir('weather') {
@@ -83,7 +89,10 @@ pipeline {
                             -Dsonar.projectKey=weather-Python-App '''
                         }
                         timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
+                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                            if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
                         }
 
                 }
