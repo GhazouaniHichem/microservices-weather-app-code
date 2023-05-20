@@ -138,6 +138,20 @@ pipeline {
                  script {
                      docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                          try {
+                             sh 'checkov --file auth/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                         } catch (err) {
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             throw err
+                         }
+                         try {
+                             sh 'checkov --file UI/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                         } catch (err) {
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             throw err
+                         }
+                         try {
                              sh 'checkov --file weather/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
                              junit skipPublishingChecks: true, testResults: 'results.xml'
                          } catch (err) {
