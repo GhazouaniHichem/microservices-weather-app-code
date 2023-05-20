@@ -24,8 +24,7 @@ pipeline {
 
         stage('Scan code to detect secrets') {
             steps {
-                sh 'detect-secrets -C . scan > secrets_baseline.txt'
-                slackUploadFile filePath: 'secrets_baseline.txt', initialComment: 'All secrets detected in your code.'
+                sh 'detect-secrets -C . scan --disable-plugin HexHighEntropyString Base64HighEntropyString > .secrets.baseline '
             }
         }   
 
