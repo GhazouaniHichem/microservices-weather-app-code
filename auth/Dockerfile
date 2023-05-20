@@ -2,8 +2,8 @@
 FROM golang:alpine AS builder
 RUN apk add git
 WORKDIR /go/src/app
-RUN git clone https://github.com/abohmeed/weatherapp
-WORKDIR /go/src/app/weatherapp/auth/src/main
+RUN git clone https://github.com/GhazouaniHichem/microservices-weather-app-code
+WORKDIR /go/src/app/microservices-weather-app-code/auth/src/main
 RUN go build -o /go/bin/app -v ./...
 
 #final stage
