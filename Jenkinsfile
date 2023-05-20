@@ -108,8 +108,24 @@ pipeline {
         stage('Snyk Dependency Check') {
             steps {
 
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
-                   dependencyCheckPublisher pattern: '**/dependency-check-report.xml'           
+                dir('auth') { 
+                    script {
+                        sh 'syft ./UI -o cyclonedx-json=auth.sbom.cdx.json'
+                        sh 'grype sbom:./auth.sbom.cdx.json'
+                    }
+                }
+                dir('UI') { 
+                    script {
+                        sh 'syft ./UI -o cyclonedx-json=UI.sbom.cdx.json'
+                        sh 'grype sbom:./UI.sbom.cdx.json'
+                    }         
+                }
+                dir('weather') { 
+                    script {
+                        sh 'syft ./UI -o cyclonedx-json=weather.sbom.cdx.json'
+                        sh 'grype sbom:./weather.sbom.cdx.json'
+                    }          
+                }       
                 
             }
         }
