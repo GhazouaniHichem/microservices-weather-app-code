@@ -1,4 +1,4 @@
-module github.com/abohmeed/auth
+module github.com/GhazouaniHichem/auth
 
 go 1.17
 
@@ -27,4 +27,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
-replace github.com/abohmeed/auth/authdb => ../authdb
+replace github.com/GhazouaniHichem/auth/authdb => ../authdb

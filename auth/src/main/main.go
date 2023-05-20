@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/abohmeed/auth/authdb"
+	"github.com/GhazouaniHichem/auth/authdb"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
