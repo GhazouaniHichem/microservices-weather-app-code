@@ -189,7 +189,7 @@ pipeline {
                     script {
 
                         int x = "${BUILD_NUMBER}" as Integer; 
-                        def TAG = "${x/10}"
+                        def TAG = "${x/10}";
 
 
                         withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
@@ -221,12 +221,15 @@ pipeline {
         }
 
         stage('Trigger gitops pipeline') {
-            int x = "${BUILD_NUMBER}" as Integer; 
-            def TAG = "${x/10}"
+            
             steps {
-                build job: 'weather-app-gitops-pipeline', parameters: [
-                string(name: 'IMAGE_TAG', value: "${TAG}")
-                ]
+                script {
+                    int x = "${BUILD_NUMBER}" as Integer; 
+                    def TAG = "${x/10}"
+                    build job: 'weather-app-gitops-pipeline', parameters: [
+                    string(name: 'IMAGE_TAG', value: "${TAG}")
+                    ]
+                }
             }
         }   
     }
