@@ -21,7 +21,7 @@ pipeline {
                 git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/microservices-weather-app-code.git'
             }
         }
-        
+
         stage('Scan code to detect secrets') {
             steps {
                 sh 'detect-secrets -C . scan --disable-plugin HexHighEntropyString Base64HighEntropyString > .secrets.baseline '
@@ -185,9 +185,13 @@ pipeline {
 
         stage('Docker Push Images to DockerHub') {
             steps {
-                    int x = "${BUILD_NUMBER}" as Integer; 
-                    def TAG = "${x/10}"
+                    
                     script {
+
+                        int x = "${BUILD_NUMBER}" as Integer; 
+                        def TAG = "${x/10}"
+
+
                         withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
                             dir('microservices/auth') {
                                 sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${TAG}"
