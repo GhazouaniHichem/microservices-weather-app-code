@@ -138,7 +138,7 @@ pipeline {
                  script {
                      docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                          try {
-                             sh 'checkov --file weather/Dockerfile --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml'
+                             sh 'checkov --file weather/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
                              junit skipPublishingChecks: true, testResults: 'results.xml'
                          } catch (err) {
                              junit skipPublishingChecks: true, testResults: 'results.xml'
