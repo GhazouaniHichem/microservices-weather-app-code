@@ -28,6 +28,18 @@ pipeline {
             }
         }   
 
+        stage('Code Build') {
+            steps {
+                dir('UI') {
+                    sh "npm install"
+                }
+
+                dir('auth/src/main') {
+                    sh "go build"
+                }
+            }
+        }  
+
         stage('Snyk Dependency Check') {
             steps {
 
@@ -114,18 +126,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Code Build') {
-            steps {
-                dir('UI') {
-                    sh "npm install"
-                }
-
-                dir('auth/src/main') {
-                    sh "go build"
-                }
-            }
-        }        
+      
 /*      stage('Run Unit Tests Cases') {
             steps {
 
