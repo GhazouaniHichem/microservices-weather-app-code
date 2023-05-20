@@ -7,7 +7,7 @@ pipeline {
     }
 
     stages {
-         stage('Cleanup Workspace'){
+        stage('Cleanup Workspace'){
             steps {
                 script {
                     cleanWs()
@@ -33,7 +33,7 @@ pipeline {
                 }
             }
         }        
-/*         stage('Run Test Cases') {
+/*      stage('Run Test Cases') {
             steps {
                 dir('client') {
                     sh "npm run test"
@@ -106,12 +106,11 @@ pipeline {
             }
         }
         
-        stage('OWASP Dependency Check') {
+        stage('Snyk Dependency Check') {
             steps {
-
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
-                   dependencyCheckPublisher pattern: '**/dependency-check-report.xml'           
-                
+                dir(UI) {
+                    snykSecurity organisation: 'ghazouanih68', projectName: 'weather-app-snyk', severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token', targetFile: './UI/package.json'   
+                }
             }
         }
         
