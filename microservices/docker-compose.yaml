@@ -32,14 +32,14 @@ services:
     image: ghazouanihm/weatherapp-weather:1.0
     user: ghazouanihm
     environment:
-      APIKEY: 9bf8ba9657ba467ca4b123541231105
+      APIKEY: "pass_your_api_key"
     networks:
       - app-net
   db:
     restart: always
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_ROOT_PASSWORD: "pass_your_database_password"
     networks:
       - app-net
     volumes:
