@@ -110,19 +110,19 @@ pipeline {
 
                 dir('auth') { 
                     script {
-                        sh 'syft ./UI -o cyclonedx-json=auth.sbom.cdx.json'
+                        sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
                         sh 'grype sbom:./auth.sbom.cdx.json'
                     }
                 }
                 dir('UI') { 
                     script {
-                        sh 'syft ./UI -o cyclonedx-json=UI.sbom.cdx.json'
+                        sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
                         sh 'grype sbom:./UI.sbom.cdx.json'
                     }         
                 }
                 dir('weather') { 
                     script {
-                        sh 'syft ./UI -o cyclonedx-json=weather.sbom.cdx.json'
+                        sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
                         sh 'grype sbom:./weather.sbom.cdx.json'
                     }          
                 }       
