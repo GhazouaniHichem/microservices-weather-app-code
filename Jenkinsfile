@@ -108,11 +108,11 @@ pipeline {
         stage('OWASP Dependency Check') {
             steps {
                 dir('auth') { 
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan ./src/main', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('UI') { 
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan ./requirements.txt', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('weather') { 
