@@ -25,8 +25,7 @@ pipeline {
         stage('Scan code to detect secrets') {
             steps {
                 script {
-                    def Secrets-Detection-Result
-                    Secrets-Detection-Result = sh (
+                    def Secrets-Detection-Result = sh (
                         script: 'detect-secrets scan . --all-files',
                         returnStdout: true
                     ).trim()
