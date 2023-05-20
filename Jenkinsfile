@@ -72,6 +72,7 @@ pipeline {
             }
 
             steps {
+                
                 dir('microservices/UI') {
                     script {
                         withSonarQubeEnv('sonar-server') {
