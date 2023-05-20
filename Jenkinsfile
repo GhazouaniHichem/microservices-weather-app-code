@@ -27,6 +27,10 @@ pipeline {
                 dir('UI') {
                     sh "npm install"
                 }
+
+                dir('auth/src/main') {
+                    sh "go build"
+                }
             }
         }        
 /*         stage('Run Test Cases') {
@@ -109,11 +113,11 @@ pipeline {
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('UI') { 
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan ./node_modules', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('weather') { 
-                   dependencyCheck additionalArguments: '--scan ./requirements.txt', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
             }
