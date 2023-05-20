@@ -72,7 +72,7 @@ pipeline {
             }
 
             steps {
-                
+
                 dir('microservices/UI') {
                     script {
                         withSonarQubeEnv('sonar-server') {
@@ -204,11 +204,11 @@ pipeline {
             }
         }
 
-        stage('Apply argocd appliction file') {
+        stage('Deploy argocd applictions') {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
-                        sh 'kubectl apply -f gitops'
+                        sh 'kubectl apply -f argocd-applications'
                     }
                 }
             }
