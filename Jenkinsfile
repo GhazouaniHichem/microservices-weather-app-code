@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Cleanup Workspace'){
             steps {
                 script {
@@ -20,29 +21,12 @@ pipeline {
                 git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/microservices-weather-app-code.git'
             }
         }
-        
-        stage('Code Build') {
-            steps {
-                dir('UI') {
-                    sh "npm install"
-                }
 
-                dir('auth/src/main') {
-                    sh "go build"
-                }
-            }
-        }        
-/*         stage('Run Test Cases') {
+        stage('Scan code to detect secrets') {
             steps {
-                dir('client') {
-                    sh "npm run test"
-                }
-                dir('server') {
-                    sh "npm run test" 
-                }
+                sh 'detect-secrets scan . --all-files'
             }
-        }
-*/      
+        }   
 
         stage('Snyk Dependency Check') {
             steps {
@@ -130,7 +114,24 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Code Build') {
+            steps {
+                dir('UI') {
+                    sh "npm install"
+                }
+
+                dir('auth/src/main') {
+                    sh "go build"
+                }
+            }
+        }        
+/*      stage('Run Unit Tests Cases') {
+            steps {
+
+            }
+        } */
+       
         stage('Docker Build & Push') {
             steps {
                    script {
