@@ -42,7 +42,33 @@ pipeline {
                 }
             }
         }
-*/        
+*/      
+
+        stage('Snyk Dependency Check') {
+            steps {
+
+                dir('auth') { 
+                    script {
+                        sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
+                        sh 'grype sbom:./auth.sbom.cdx.json'
+                    }
+                }
+                dir('UI') { 
+                    script {
+                        sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
+                        sh 'grype sbom:./UI.sbom.cdx.json'
+                    }         
+                }
+                dir('weather') { 
+                    script {
+                        sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
+                        sh 'grype sbom:./weather.sbom.cdx.json'
+                    }          
+                }       
+                
+            }
+        }
+
         stage('Sonarqube Analysis') {
 
             environment{
@@ -102,31 +128,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-        
-        stage('Snyk Dependency Check') {
-            steps {
-
-                dir('auth') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
-                        sh 'grype sbom:./auth.sbom.cdx.json'
-                    }
-                }
-                dir('UI') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
-                        sh 'grype sbom:./UI.sbom.cdx.json'
-                    }         
-                }
-                dir('weather') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
-                        sh 'grype sbom:./weather.sbom.cdx.json'
-                    }          
-                }       
-                
             }
         }
         

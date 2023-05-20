@@ -1,5 +1,5 @@
 #build stage
-FROM golang:alpine AS builder
+FROM golang:1.20.4-alpine3.18 AS builder
 RUN apk add git
 WORKDIR /go/src/app
 RUN git clone https://github.com/GhazouaniHichem/microservices-weather-app-code
