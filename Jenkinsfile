@@ -61,12 +61,12 @@ pipeline {
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
                             -Dsonar.projectKey=UI-NodeJS-App '''
                         }
-//                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-//                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-//                            if (qg.status != 'OK') {
-//                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-//                            }
-//                        }
+                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                            if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
                     }
                 }
                 dir('auth') {
@@ -109,11 +109,11 @@ pipeline {
         stage('OWASP Dependency Check') {
             steps {
                 dir('auth') { 
-                   dependencyCheck additionalArguments: '--scan ./src/main', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan ./src/main/go.mod', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('UI') { 
-                   dependencyCheck additionalArguments: '--scan ./node_modules', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('weather') { 
