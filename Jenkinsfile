@@ -25,6 +25,7 @@ pipeline {
         stage('Scan code to detect secrets') {
             steps {
                 sh 'detect-secrets -C . scan > .secrets.baseline'
+                slackUploadFile filePath: './.secrets.baseline', initialComment: 'All secrets detected in your code.'
             }
         }   
 
@@ -134,23 +135,23 @@ pipeline {
                      docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                          try {
                              sh 'checkov --file auth/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
                          } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
                              throw err
                          }
                          try {
                              sh 'checkov --file UI/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
                          } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
                              throw err
                          }
                          try {
                              sh 'checkov --file weather/Dockerfile -o cli -o junitxml --output-file-path console,results.xml'
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
                          } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
                              throw err
                          }
                      }
@@ -241,7 +242,6 @@ pipeline {
                         color = 'warning'
                     
                 }
-                slackUploadFile filePath: '.secrets.baseline', initialComment: 'All secrets detected in your code.'
                 slackSend(channel: '#devops', message: "Update Deployment ${status.toLowerCase()} for ${env.JOB_NAME} (${env.BUILD_NUMBER}) - ${env.BUILD_URL}", iconEmoji: ':jenkins:', color: color)
             }
         }
