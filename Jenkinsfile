@@ -4,11 +4,10 @@ pipeline {
     tools {
         nodejs 'node'
         go 'go-1.20'
-        snyk 'snyk'
     }
 
     stages {
-        stage('Cleanup Workspace'){
+         stage('Cleanup Workspace'){
             steps {
                 script {
                     cleanWs()
@@ -34,7 +33,7 @@ pipeline {
                 }
             }
         }        
-/*      stage('Run Test Cases') {
+/*         stage('Run Test Cases') {
             steps {
                 dir('client') {
                     sh "npm run test"
@@ -109,9 +108,10 @@ pipeline {
         
         stage('Snyk Dependency Check') {
             steps {
-                dir(UI) {
-                        snykSecurity organisation: '334031bf-c987-4fc1-bd77-4aa709a1beca', projectName: 'weatherapp-test', severity: 'high', snykInstallation: 'snyk', snykTokenId: 'snyk-api-token', targetFile: 'package.json'
-                }
+
+                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheckPublisher pattern: '**/dependency-check-report.xml'           
+                
             }
         }
         
