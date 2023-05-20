@@ -110,7 +110,7 @@ pipeline {
             steps {
                 dir(UI) {
                     script {
-                        snykSecurity organisation: 'ghazouanih68', projectName: 'weather-app-snyk', severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token', targetFile: './UI/package.json'   
+                        snykSecurity(organisation: 'ghazouanih68', projectName: 'weather-app-snyk', severity: 'medium', snykInstallation: 'snyk', snykTokenId: 'snyk-api-token', targetFile: './UI/package.json')   
                     }
                 }
             }
