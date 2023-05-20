@@ -109,7 +109,9 @@ pipeline {
         stage('Snyk Dependency Check') {
             steps {
                 dir(UI) {
-                    snykSecurity organisation: 'ghazouanih68', projectName: 'weather-app-snyk', severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token', targetFile: './UI/package.json'   
+                    script {
+                        snykSecurity organisation: 'ghazouanih68', projectName: 'weather-app-snyk', severity: 'medium', snykInstallation: 'Snyk', snykTokenId: 'snyk-api-token', targetFile: './UI/package.json'   
+                    }
                 }
             }
         }
