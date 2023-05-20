@@ -24,8 +24,8 @@ pipeline {
 
         stage('Scan code to detect secrets') {
             steps {
-                sh 'detect-secrets -C . scan > .secrets.baseline'
-                slackUploadFile filePath: './.secrets.baseline', initialComment: 'All secrets detected in your code.'
+                sh 'detect-secrets -C . scan > secrets.baseline'
+                slackUploadFile filePath: 'secrets.baseline', initialComment: 'All secrets detected in your code.'
             }
         }   
 
