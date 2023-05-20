@@ -15,17 +15,6 @@ pipeline {
             }
         }
 
-        stage('Install needed tools'){
-            steps {
-                script {
-                    sh 'sudo su -'
-                    sh 'curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin'
-                    sh 'curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin'
-                }
-            }
-        }
-
-
         stage('Git Checkout ') {
             steps {
                 git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/microservices-weather-app-code.git'
