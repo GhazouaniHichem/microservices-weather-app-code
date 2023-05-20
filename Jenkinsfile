@@ -24,13 +24,7 @@ pipeline {
 
         stage('Scan code to detect secrets') {
             steps {
-                script {
-                    Secrets-Detection-Result = sh (
-                        script: 'detect-secrets scan . --all-files',
-                        returnStdout: true
-                    ).trim()
-                    echo "Secrets Detection Result:\n ${Secrets-Detection-Result}"
-                }
+                sh 'detect-secrets -C . scan > .secrets.baseline'
             }
         }   
 
@@ -247,6 +241,7 @@ pipeline {
                         color = 'warning'
                     
                 }
+                slackUploadFile filePath: '.secrets.baseline', initialComment: 'All secrets detected in your code.'
                 slackSend(channel: '#devops', message: "Update Deployment ${status.toLowerCase()} for ${env.JOB_NAME} (${env.BUILD_NUMBER}) - ${env.BUILD_URL}", iconEmoji: ':jenkins:', color: color)
             }
         }
