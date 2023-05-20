@@ -40,7 +40,7 @@ pipeline {
             }
         }  
 
-        stage('Snyk Dependency Check') {
+        stage('Project Dependency-Check') {
             steps {
 
                 dir('auth') { 
@@ -100,8 +100,8 @@ pipeline {
                             -Dsonar.language=go \
                             -Dsonar.projectKey=auth-Golang-App '''
                         }
-                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                        timeout(time: 1, unit: 'HOURS') { 
+                            def qg = waitForQualityGate() 
                             if (qg.status != 'OK') {
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                             }
@@ -116,8 +116,8 @@ pipeline {
                             -Dsonar.language=py \
                             -Dsonar.projectKey=weather-Python-App '''
                         }
-                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                        timeout(time: 1, unit: 'HOURS') { 
+                            def qg = waitForQualityGate() 
                             if (qg.status != 'OK') {
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                             }
@@ -127,11 +127,6 @@ pipeline {
             }
         }
       
-/*      stage('Run Unit Tests') {
-            steps {
-
-            }
-        } */
 
         stage('Scan Dockerfiles with Checkov') {
              steps {
@@ -163,35 +158,48 @@ pipeline {
              }
          }
        
-        stage('Docker Build & Push') {
+        stage('Docker Build Images') {
             steps {
                    script {
-                       withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
-                            dir('auth') {
-                                sh "docker build -t weatherapp-auth ."
-                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
-                            }
-                            dir('UI') {
-                                sh "docker build -t weatherapp-ui ."
-                                sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
-                            }
-                            dir('weather') {
-                                sh "docker build -t weatherapp-weather ."
-                                sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
-                            }
+                        dir('auth') {
+                            sh "docker build -t weatherapp-auth ."
+                        }
+                        dir('UI') {
+                            sh "docker build -t weatherapp-ui ."
+                        }
+                        dir('weather') {
+                            sh "docker build -t weatherapp-weather ."
                         }
                    } 
             }
         }
         
-        stage('Docker Image scan') {
+        stage('Scan Docker Images') {
             steps {
-                    sh "trivy image ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
-                    sh "trivy image ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
-                    sh "trivy image ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                    sh "trivy image weatherapp-auth:${BUILD_NUMBER}"
+                    sh "trivy image weatherapp-ui:${BUILD_NUMBER}"
+                    sh "trivy image weatherapp-weather:${BUILD_NUMBER}"
+            }
+        }
+
+        stage('Docker Push Images to DockerHub') {
+            steps {
+                   script {
+                       withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
+                            dir('auth') {
+                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
+                            }
+                            dir('UI') {
+                                sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                            }
+                            dir('weather') {
+                                sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                                sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                            }
+                        }
+                   } 
             }
         }
 
