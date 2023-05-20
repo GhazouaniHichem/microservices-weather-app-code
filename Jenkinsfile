@@ -22,6 +22,11 @@ pipeline {
             }
         }
 
+        stage('Hello') {
+            int x = "${BUILD_NUMBER}" as Integer; 
+            echo "${x/10}"
+        }
+
         stage('Scan code to detect secrets') {
             steps {
                 sh 'detect-secrets -C . scan --disable-plugin HexHighEntropyString Base64HighEntropyString > .secrets.baseline '
@@ -185,19 +190,21 @@ pipeline {
 
         stage('Docker Push Images to DockerHub') {
             steps {
-                   script {
-                       withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
+                    int x = "${BUILD_NUMBER}" as Integer; 
+                    def TAG = "${x/10}"
+                    script {
+                        withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
                             dir('microservices/auth') {
-                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
+                                sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${TAG}"
+                                sh "docker push ghazouanihm/weatherapp-auth:${TAG}"
                             }
                             dir('microservices/UI') {
-                                sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
+                                sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${TAG}"
+                                sh "docker push ghazouanihm/weatherapp-ui:${TAG}"
                             }
                             dir('microservices/weather') {
-                                sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
-                                sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
+                                sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${TAG}"
+                                sh "docker push ghazouanihm/weatherapp-weather:${TAG}"
                             }
                         }
                    } 
@@ -215,12 +222,11 @@ pipeline {
         }
 
         stage('Trigger gitops pipeline') {
-            environment {
-                IMAGE_TAG = "${BUILD_NUMBER}"
-            }
+            int x = "${BUILD_NUMBER}" as Integer; 
+            def TAG = "${x/10}"
             steps {
                 build job: 'weather-app-gitops-pipeline', parameters: [
-                string(name: 'IMAGE_TAG', value: "${env.IMAGE_TAG}")
+                string(name: 'IMAGE_TAG', value: "${TAG}")
                 ]
             }
         }   
