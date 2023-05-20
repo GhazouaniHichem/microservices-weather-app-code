@@ -3,6 +3,7 @@ services:
   auth:
     restart: always
     image: ghazouanihm/weatherapp-auth:1.0
+    user: ghazouanihm
     depends_on:
       - db
     environment:
@@ -13,6 +14,7 @@ services:
   ui:
     restart: always
     image: ghazouanihm/weatherapp-ui:1.0
+    user: ghazouanihm
     depends_on:
       - auth
       - weather
@@ -28,6 +30,7 @@ services:
   weather:
     restart: always
     image: ghazouanihm/weatherapp-weather:1.0
+    user: ghazouanihm
     environment:
       APIKEY: 9bf8ba9657ba467ca4b123541231105
     networks:

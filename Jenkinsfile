@@ -127,11 +127,27 @@ pipeline {
             }
         }
       
-/*      stage('Run Unit Tests Cases') {
+/*      stage('Run Unit Tests') {
             steps {
 
             }
         } */
+
+        stage('Scan Dockerfiles with Checkov') {
+             steps {
+                 script {
+                     docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
+                         try {
+                             sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml'
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                         } catch (err) {
+                             junit skipPublishingChecks: true, testResults: 'results.xml'
+                             throw err
+                         }
+                     }
+                 }
+             }
+         }
        
         stage('Docker Build & Push') {
             steps {
