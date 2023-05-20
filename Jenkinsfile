@@ -21,12 +21,7 @@ pipeline {
                 git credentialsId: 'github', branch: 'main', changelog: false, poll: false, url: 'https://github.com/GhazouaniHichem/microservices-weather-app-code.git'
             }
         }
-
-        stage('Hello') {
-            int x = "${BUILD_NUMBER}" as Integer; 
-            echo "${x/10}"
-        }
-
+        
         stage('Scan code to detect secrets') {
             steps {
                 sh 'detect-secrets -C . scan --disable-plugin HexHighEntropyString Base64HighEntropyString > .secrets.baseline '
