@@ -30,11 +30,11 @@ pipeline {
 
         stage('Code Build') {
             steps {
-                dir('UI') {
+                dir('microservices/UI') {
                     sh "npm install"
                 }
 
-                dir('auth/src/main') {
+                dir('microservices/auth/src/main') {
                     sh "go build"
                 }
             }
@@ -43,19 +43,19 @@ pipeline {
         stage('Project Dependency-Check') {
             steps {
 
-                dir('auth') { 
+                dir('microservices/auth') { 
                     script {
                         sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
                         sh 'grype sbom:./auth.sbom.cdx.json'
                     }
                 }
-                dir('UI') { 
+                dir('microservices/UI') { 
                     script {
                         sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
                         sh 'grype sbom:./UI.sbom.cdx.json'
                     }         
                 }
-                dir('weather') { 
+                dir('microservices/weather') { 
                     script {
                         sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
                         sh 'grype sbom:./weather.sbom.cdx.json'
@@ -72,7 +72,7 @@ pipeline {
             }
 
             steps {
-                dir('UI') {
+                dir('microservices/UI') {
                     script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner \
@@ -90,7 +90,7 @@ pipeline {
                         }
                     }
                 }
-                dir('auth') {
+                dir('microservices/auth') {
                     script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
@@ -108,7 +108,7 @@ pipeline {
                         }
                     }
                 }
-                dir('weather') {
+                dir('microservices/weather') {
                     script {
                         withSonarQubeEnv('sonar-server') {
                             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
@@ -133,21 +133,21 @@ pipeline {
                  script {
                      docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                          try {
-                             sh 'checkov --file auth/Dockerfile -o cli -o junitxml --output-file-path console,auth-check-results.xml'
+                             sh 'checkov --file microservices/auth/Dockerfile -o cli -o junitxml --output-file-path console,auth-check-results.xml'
                              junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
                          } catch (err) {
                              junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
                              throw err
                          }
                          try {
-                             sh 'checkov --file UI/Dockerfile -o cli -o junitxml --output-file-path console,UI-check-results.xml'
+                             sh 'checkov --file microservices/UI/Dockerfile -o cli -o junitxml --output-file-path console,UI-check-results.xml'
                              junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
                          } catch (err) {
                              junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
                              throw err
                          }
                          try {
-                             sh 'checkov --file weather/Dockerfile -o cli -o junitxml --output-file-path console,weather-check-results.xml'
+                             sh 'checkov --file microservices/weather/Dockerfile -o cli -o junitxml --output-file-path console,weather-check-results.xml'
                              junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
                          } catch (err) {
                              junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
@@ -161,13 +161,13 @@ pipeline {
         stage('Docker Build Images') {
             steps {
                    script {
-                        dir('auth') {
+                        dir('microservices/auth') {
                             sh "docker build -t weatherapp-auth ."
                         }
-                        dir('UI') {
+                        dir('microservices/UI') {
                             sh "docker build -t weatherapp-ui ."
                         }
-                        dir('weather') {
+                        dir('microservices/weather') {
                             sh "docker build -t weatherapp-weather ."
                         }
                    } 
@@ -186,15 +186,15 @@ pipeline {
             steps {
                    script {
                        withDockerRegistry([ credentialsId: 'docker-cred', url: '' ]) {
-                            dir('auth') {
+                            dir('microservices/auth') {
                                 sh "docker tag weatherapp-auth ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
                                 sh "docker push ghazouanihm/weatherapp-auth:${BUILD_NUMBER}"
                             }
-                            dir('UI') {
+                            dir('microservices/UI') {
                                 sh "docker tag weatherapp-ui ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
                                 sh "docker push ghazouanihm/weatherapp-ui:${BUILD_NUMBER}"
                             }
-                            dir('weather') {
+                            dir('microservices/weather') {
                                 sh "docker tag weatherapp-weather ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
                                 sh "docker push ghazouanihm/weatherapp-weather:${BUILD_NUMBER}"
                             }
