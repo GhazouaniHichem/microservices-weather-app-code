@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         nodejs 'node'
+        go 'go-1.20'
     }
 
     stages {
