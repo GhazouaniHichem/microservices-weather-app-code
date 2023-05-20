@@ -108,8 +108,18 @@ pipeline {
         
         stage('OWASP Dependency Check') {
             steps {
-                   dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DPCHECK'
-                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml' 
+                dir('auth') { 
+                   dependencyCheck additionalArguments: '--scan ./src/main/go.mod', odcInstallation: 'DPCHECK'
+                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
+                }
+                dir('UI') { 
+                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
+                }
+                dir('weather') { 
+                   dependencyCheck additionalArguments: '--scan . --disableNSP "true" --enableExperimental --disablePyDist "false" --disablePyPkg "false"', odcInstallation: 'DPCHECK'
+                   dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
+                }
             }
         }
         
