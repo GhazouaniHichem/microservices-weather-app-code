@@ -176,9 +176,9 @@ pipeline {
         
         stage('Scan Docker Images') {
             steps {
-                    sh "trivy image weatherapp-auth:${BUILD_NUMBER}"
-                    sh "trivy image weatherapp-ui:${BUILD_NUMBER}"
-                    sh "trivy image weatherapp-weather:${BUILD_NUMBER}"
+                    sh "trivy image weatherapp-auth"
+                    sh "trivy image weatherapp-ui"
+                    sh "trivy image weatherapp-weather"
             }
         }
 
