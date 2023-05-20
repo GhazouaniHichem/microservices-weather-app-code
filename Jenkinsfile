@@ -21,17 +21,13 @@ pipeline {
             }
         }
         
-/*        stage('Code Build') {
+        stage('Code Build') {
             steps {
-                dir('client') {
-                    sh "npm install"
-                }
-                dir('server') {
+                dir('UI') {
                     sh "npm install"
                 }
             }
-        }
-*/        
+        }        
 /*         stage('Run Test Cases') {
             steps {
                 dir('client') {
@@ -112,11 +108,11 @@ pipeline {
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('UI') { 
-                   dependencyCheck additionalArguments: '--scan ./requirements.txt', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
                 dir('weather') { 
-                   dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DPCHECK'
+                   dependencyCheck additionalArguments: '--scan ./requirements.txt', odcInstallation: 'DPCHECK'
                    dependencyCheckPublisher pattern: '**//*dependency-check-report.xml'           
                 }
             }
