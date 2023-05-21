@@ -1,3 +1,14 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-canary-deploy
+  labels:
+    monitoring: prometheus
+    istio-injection: enabled
+
+---
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
