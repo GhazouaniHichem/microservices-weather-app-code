@@ -122,8 +122,8 @@ pipeline {
                                     -Dsonar.language=py \
                                     -Dsonar.projectKey=weather-Python-App '''
                                 }
-                                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                timeout(time: 1, unit: 'HOURS') {
+                                    def qg = waitForQualityGate()
                                     if (qg.status != 'OK') {
                                     error "Pipeline aborted due to quality gate failure: ${qg.status}"
                                     }
@@ -143,8 +143,8 @@ pipeline {
                                     -Dsonar.language=go \
                                     -Dsonar.projectKey=auth-Golang-App '''
                                 }
-                                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                timeout(time: 1, unit: 'HOURS') {
+                                    def qg = waitForQualityGate()
                                     if (qg.status != 'OK') {
                                     error "Pipeline aborted due to quality gate failure: ${qg.status}"
                                     }
@@ -243,8 +243,8 @@ pipeline {
                 script {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
                         sh 'kubectl apply -f argocd-applications/argocd-app-simple-deployment.yaml'
-                        sh 'kubectl apply -f argocd-applications/argocd-app-rollouts-deployment.yaml'
-                        sh 'kubectl apply -f argocd-applications/argocd-app-istio-canary-deployment.yaml'
+//                        sh 'kubectl apply -f argocd-applications/argocd-app-rollouts-deployment.yaml'
+//                        sh 'kubectl apply -f argocd-applications/argocd-app-istio-canary-deployment.yaml'
                     }
                 }
             }
