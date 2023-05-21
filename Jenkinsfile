@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Cleanup Workspace'){
             steps {
                 script {
@@ -30,13 +31,17 @@ pipeline {
         stage('Code Build') {
             parallel {
                 stage('Build UI microservice') {
-                    dir('microservices/UI') {
-                        sh "npm install"
+                    steps {
+                        dir('microservices/UI') {
+                            sh "npm install"
+                        }
                     }
                 }
                 stage('Build auth microservice') {
-                    dir('microservices/auth/src/main') {
-                        sh "go build"
+                    steps {
+                        dir('microservices/auth/src/main') {
+                            sh "go build"
+                        }
                     }
                 }
             }
@@ -45,29 +50,32 @@ pipeline {
         stage('Project Dependency-Check') {
             parallel {
                 stage('Dependency-check auth microservice') {
-                    dir('microservices/auth') { 
-                        script {
-                            sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
-                            sh 'grype sbom:./auth.sbom.cdx.json'
+                    steps {
+                        dir('microservices/auth') { 
+                            script {
+                                sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
+                                sh 'grype sbom:./auth.sbom.cdx.json'
+                            }
                         }
                     }
                 }
                 stage('Dependency-check UI microservice') {
-                    dir('microservices/UI') { 
-                        script {
-                            sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
-                            sh 'grype sbom:./UI.sbom.cdx.json'
-                        }         
-                    }
+                        dir('microservices/UI') { 
+                            script {
+                                sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
+                                sh 'grype sbom:./UI.sbom.cdx.json'
+                            }         
+                        }
                 }
                 stage('Dependency-check weather microservice') {
-                    dir('microservices/weather') { 
-                        script {
-                            sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
-                            sh 'grype sbom:./weather.sbom.cdx.json'
-                        }          
-                    }       
-                
+                    steps {
+                        dir('microservices/weather') { 
+                            script {
+                                sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
+                                sh 'grype sbom:./weather.sbom.cdx.json'
+                            }          
+                        }       
+                    }
                 }
             }
         }
@@ -80,65 +88,70 @@ pipeline {
 
             parallel {
                 stage ('Analyse UI microservice') {
-                    dir('microservices/UI') {
-                        script {
-                            withSonarQubeEnv('sonar-server') {
-                                sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                                -Dsonar.projectName=UI-NodeJS-App \
-                                -Dsonar.sources=. \
-                                -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
-                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                                -Dsonar.projectKey=UI-NodeJS-App '''
-                            }
-                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                                if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    steps {
+                        dir('microservices/UI') {
+                            script {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                                    -Dsonar.projectName=UI-NodeJS-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
+                                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                                    -Dsonar.projectKey=UI-NodeJS-App '''
+                                }
+                                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                    if (qg.status != 'OK') {
+                                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                stage ('Analyse UI microservice') {
-                    dir('microservices/auth') {
-                        script {
-                            withSonarQubeEnv('sonar-server') {
-                                sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
-                                -Dsonar.sources=. \
-                                -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
-                                -Dsonar.inclusions=**/*.go \
-                                -Dsonar.language=go \
-                                -Dsonar.projectKey=auth-Golang-App '''
-                            }
-                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                                if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                stage ('Analyse weather microservice') {
+                    steps {
+                        dir('microservices/weather') {
+                            script {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.language=py \
+                                    -Dsonar.projectKey=weather-Python-App '''
+                                }
+                                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                    if (qg.status != 'OK') {
+                                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                stage ('Analyse UI microservice') {
-                    dir('microservices/weather') {
-                        script {
-                            withSonarQubeEnv('sonar-server') {
-                                sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
-                                -Dsonar.sources=. \
-                                -Dsonar.language=py \
-                                -Dsonar.projectKey=weather-Python-App '''
-                            }
-                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                                if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                stage ('Analyse auth microservice') {
+                    steps {
+                        dir('microservices/auth') {
+                            script {
+                                withSonarQubeEnv('sonar-server') {
+                                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.language=go \
+                                    -Dsonar.projectKey=auth-Golang-App '''
+                                }
+                                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                    if (qg.status != 'OK') {
+                                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
             }
         }
 
