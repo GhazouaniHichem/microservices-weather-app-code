@@ -20,7 +20,7 @@ spec:
   source:
     repoURL: https://github.com/GhazouaniHichem/microservices-weather-app-gitops.git
     targetRevision: main
-    path: ./kubernetes/argo-rollout-deployment/
+    path: ./kubernetes/weather-app-argo-rollout-deployment/
   destination: 
     server: https://kubernetes.default.svc
     namespace: weather-app
