@@ -214,7 +214,7 @@ pipeline {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
-                        sh 'kubectl apply -f argocd-applications'
+                        sh 'kubectl apply -f argocd-applications/argo-cd-simple-deployment.yaml'
                     }
                 }
             }
