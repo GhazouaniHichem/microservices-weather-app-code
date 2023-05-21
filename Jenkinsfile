@@ -244,7 +244,7 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubernetes-config']) {
                         sh 'kubectl apply -f argocd-applications/argocd-app-simple-deployment.yaml'
                         sh 'kubectl apply -f argocd-applications/argocd-app-rollouts-deployment.yaml'
-                        sh 'kubectl apply -f argocd-applications/argocd-app-istio-canary-deployment.yaml'
+//                        sh 'kubectl apply -f argocd-applications/argocd-app-istio-canary-deployment.yaml'
                     }
                 }
             }
