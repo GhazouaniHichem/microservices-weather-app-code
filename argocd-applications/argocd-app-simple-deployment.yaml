@@ -23,7 +23,7 @@ spec:
     path: ./kubernetes/weather-app-simple-deployment/
   destination: 
     server: https://kubernetes.default.svc
-    namespace: weather-app
+    namespace: simple-deploy
 
   syncPolicy:
     syncOptions:

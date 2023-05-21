@@ -23,7 +23,7 @@ spec:
     path: ./kubernetes/weather-app-argo-rollout-deployment/
   destination: 
     server: https://kubernetes.default.svc
-    namespace: weather-app
+    namespace: rollout-deploy
 
   syncPolicy:
     syncOptions:
