@@ -7,7 +7,6 @@ pipeline {
     }
 
     stages {
-
         stage('Cleanup Workspace'){
             steps {
                 script {
@@ -29,39 +28,47 @@ pipeline {
         }   
 
         stage('Code Build') {
-            steps {
-                dir('microservices/UI') {
-                    sh "npm install"
-                }
-
-                dir('microservices/auth/src/main') {
-                    sh "go build"
-                }
-            }
-        }  
-
-        stage('Project Dependency-Check') {
-            steps {
-
-                dir('microservices/auth') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
-                        sh 'grype sbom:./auth.sbom.cdx.json'
+            parallel {
+                stage('Build UI microservice') {
+                    dir('microservices/UI') {
+                        sh "npm install"
                     }
                 }
-                dir('microservices/UI') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
-                        sh 'grype sbom:./UI.sbom.cdx.json'
-                    }         
+                stage('Build auth microservice') {
+                    dir('microservices/auth/src/main') {
+                        sh "go build"
+                    }
                 }
-                dir('microservices/weather') { 
-                    script {
-                        sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
-                        sh 'grype sbom:./weather.sbom.cdx.json'
-                    }          
-                }       
+            }
+        }
+
+        stage('Project Dependency-Check') {
+            parallel {
+                stage('Dependency-check auth microservice') {
+                    dir('microservices/auth') { 
+                        script {
+                            sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
+                            sh 'grype sbom:./auth.sbom.cdx.json'
+                        }
+                    }
+                }
+                stage('Dependency-check UI microservice') {
+                    dir('microservices/UI') { 
+                        script {
+                            sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
+                            sh 'grype sbom:./UI.sbom.cdx.json'
+                        }         
+                    }
+                }
+                stage('Dependency-check weather microservice') {
+                    dir('microservices/weather') { 
+                        script {
+                            sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
+                            sh 'grype sbom:./weather.sbom.cdx.json'
+                        }          
+                    }       
                 
+                }
             }
         }
 
@@ -71,94 +78,100 @@ pipeline {
                 SCANNER_HOME= tool 'sonar-scanner'
             }
 
-            steps {
+            parallel {
+                stage ('Analyse UI microservice') {
+                    dir('microservices/UI') {
+                        script {
+                            withSonarQubeEnv('sonar-server') {
+                                sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                                -Dsonar.projectName=UI-NodeJS-App \
+                                -Dsonar.sources=. \
+                                -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                                -Dsonar.projectKey=UI-NodeJS-App '''
+                            }
+                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                }
+                            }
+                        }
+                    }
+                }
 
-                dir('microservices/UI') {
-                    script {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                            -Dsonar.projectName=UI-NodeJS-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.projectKey=UI-NodeJS-App '''
-                        }
-                        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                stage ('Analyse UI microservice') {
+                    dir('microservices/auth') {
+                        script {
+                            withSonarQubeEnv('sonar-server') {
+                                sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
+                                -Dsonar.sources=. \
+                                -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
+                                -Dsonar.inclusions=**/*.go \
+                                -Dsonar.language=go \
+                                -Dsonar.projectKey=auth-Golang-App '''
+                            }
+                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                }
                             }
                         }
                     }
                 }
-                dir('microservices/auth') {
-                    script {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=auth-Golang-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/* \
-                            -Dsonar.inclusions=**/*.go \
-                            -Dsonar.language=go \
-                            -Dsonar.projectKey=auth-Golang-App '''
-                        }
-                        timeout(time: 1, unit: 'HOURS') { 
-                            def qg = waitForQualityGate() 
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+
+                stage ('Analyse UI microservice') {
+                    dir('microservices/weather') {
+                        script {
+                            withSonarQubeEnv('sonar-server') {
+                                sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
+                                -Dsonar.sources=. \
+                                -Dsonar.language=py \
+                                -Dsonar.projectKey=weather-Python-App '''
                             }
-                        }
-                    }
-                }
-                dir('microservices/weather') {
-                    script {
-                        withSonarQubeEnv('sonar-server') {
-                            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=weather-Python-App \
-                            -Dsonar.sources=. \
-                            -Dsonar.language=py \
-                            -Dsonar.projectKey=weather-Python-App '''
-                        }
-                        timeout(time: 1, unit: 'HOURS') { 
-                            def qg = waitForQualityGate() 
-                            if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                                if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                }
                             }
                         }
                     }
                 }
             }
         }
-      
 
         stage('Scan Dockerfiles with Checkov') {
-             steps {
-                 script {
-                     docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
-                         try {
-                             sh 'checkov --file microservices/auth/Dockerfile -o cli -o junitxml --output-file-path console,auth-check-results.xml'
-                             junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
-                         } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
-                             throw err
-                         }
-                         try {
-                             sh 'checkov --file microservices/UI/Dockerfile -o cli -o junitxml --output-file-path console,UI-check-results.xml'
-                             junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
-                         } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
-                             throw err
-                         }
-                         try {
-                             sh 'checkov --file microservices/weather/Dockerfile -o cli -o junitxml --output-file-path console,weather-check-results.xml'
-                             junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
-                         } catch (err) {
-                             junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
-                             throw err
-                         }
-                     }
-                 }
-             }
-         }
-       
+            steps {
+                script {
+                    docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
+                        try {
+                            sh 'checkov --file microservices/auth/Dockerfile -o cli -o junitxml --output-file-path console,auth-check-results.xml'
+                            junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'auth-check-results.xml'
+                            throw err
+                        }
+                        try {
+                            sh 'checkov --file microservices/UI/Dockerfile -o cli -o junitxml --output-file-path console,UI-check-results.xml'
+                            junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'UI-check-results.xml'
+                            throw err
+                        }
+                        try {
+                            sh 'checkov --file microservices/weather/Dockerfile -o cli -o junitxml --output-file-path console,weather-check-results.xml'
+                            junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'weather-check-results.xml'
+                            throw err
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Docker Build Images') {
             steps {
                    script {
@@ -174,7 +187,7 @@ pipeline {
                    } 
             }
         }
-        
+
         stage('Scan Docker Images') {
             steps {
                     sh "trivy image weatherapp-auth"
