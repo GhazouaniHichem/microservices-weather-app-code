@@ -211,7 +211,7 @@ pipeline {
             }
         }
 
-        stage('Docker Push Images to DockerHub') {
+        stage('Push Images to DockerHub') {
             steps {
                     
                     script {
