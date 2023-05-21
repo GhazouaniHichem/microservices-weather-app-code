@@ -60,12 +60,14 @@ pipeline {
                     }
                 }
                 stage('Dependency-check UI microservice') {
+                    steps {
                         dir('microservices/UI') { 
                             script {
                                 sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
                                 sh 'grype sbom:./UI.sbom.cdx.json'
                             }         
                         }
+                    }
                 }
                 stage('Dependency-check weather microservice') {
                     steps {
