@@ -53,9 +53,9 @@ pipeline {
                     steps {
                         dir('microservices/auth') { 
                             script {
-                                sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
+//                                sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
 //                                sh 'grype sbom:./auth.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
+                                grypeScan repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
                             }
                         }
                     }
@@ -64,8 +64,8 @@ pipeline {
                     steps {
                         dir('microservices/UI') { 
                             script {
-                                sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
+//                                sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
+                                grypeScan repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
 //                                sh 'grype sbom:./UI.sbom.cdx.json'
                             }         
                         }
@@ -75,8 +75,8 @@ pipeline {
                     steps {
                         dir('microservices/weather') { 
                             script {
-                                sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
+//                                sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
+                                grypeScan repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
 //                                sh 'grype sbom:./weather.sbom.cdx.json'
                             }          
                         }       
