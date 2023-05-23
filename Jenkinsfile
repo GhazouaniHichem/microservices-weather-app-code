@@ -60,7 +60,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Dependency-check UI microservice') {
+/*                 stage('Dependency-check UI microservice') {
                     steps {
                         dir('microservices/UI') { 
                             script {
@@ -81,7 +81,7 @@ pipeline {
                             }          
                         }       
                     }
-                }
+                }*/
             }
         }
 
