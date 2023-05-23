@@ -55,7 +55,7 @@ pipeline {
                             script {
                                 sh 'syft . -o cyclonedx-json=auth.sbom.cdx.json'
 //                                sh 'grype sbom:./auth.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/microservices/UI'
+                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
                             }
                         }
                     }
@@ -65,7 +65,7 @@ pipeline {
                         dir('microservices/UI') { 
                             script {
                                 sh 'syft . -o cyclonedx-json=UI.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/microservices/UI'
+                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
 //                                sh 'grype sbom:./UI.sbom.cdx.json'
                             }         
                         }
@@ -76,7 +76,7 @@ pipeline {
                         dir('microservices/weather') { 
                             script {
                                 sh 'syft . -o cyclonedx-json=weather.sbom.cdx.json'
-                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/microservices/UI'
+                                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: 'dir:/.'
 //                                sh 'grype sbom:./weather.sbom.cdx.json'
                             }          
                         }       
